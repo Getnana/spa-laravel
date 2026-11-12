@@ -1,0 +1,107 @@
+<?php
+
+use Illuminate\Support\Facades\Route;
+
+Route::post('api/auth/login', [\App\Http\Controllers\Api\AuthController::class, 'login']);
+Route::get('api/settings/recaptcha', [\App\Http\Controllers\Api\SettingsController::class, 'recaptchaPublicKey']);
+Route::get('api/rating/form/{segment}', [\App\Http\Controllers\Api\RatingController::class, 'publicForm']);
+Route::post('api/rating/public-submit', [\App\Http\Controllers\Api\RatingController::class, 'publicSubmit']);
+Route::prefix('api')->middleware('spa.auth')->group(function () {
+    Route::post('auth/logout', [\App\Http\Controllers\Api\AuthController::class, 'logout']);
+    Route::get('auth/me', [\App\Http\Controllers\Api\AuthController::class, 'me']);
+    Route::put('auth/change-password', [\App\Http\Controllers\Api\AuthController::class, 'changePassword']);
+    Route::middleware('spa.role:owner')->group(function () {
+        Route::get('users', [\App\Http\Controllers\Api\UserController::class, 'index']);
+        Route::post('users', [\App\Http\Controllers\Api\UserController::class, 'create']);
+        Route::get('users/{id}', [\App\Http\Controllers\Api\UserController::class, 'show'])->whereNumber('id');
+        Route::put('users/{id}', [\App\Http\Controllers\Api\UserController::class, 'update'])->whereNumber('id');
+        Route::delete('users/{id}', [\App\Http\Controllers\Api\UserController::class, 'delete'])->whereNumber('id');
+        Route::post('users/{id}/reset-password', [\App\Http\Controllers\Api\UserController::class, 'resetPassword'])->whereNumber('id');
+        Route::get('dashboard/summary', [\App\Http\Controllers\Api\DashboardController::class, 'summary']);
+        Route::get('dashboard/revenue-chart/{segment}', [\App\Http\Controllers\Api\DashboardController::class, 'revenueChart']);
+        Route::get('dashboard/booking-stats', [\App\Http\Controllers\Api\DashboardController::class, 'bookingStats']);
+        Route::get('dashboard/popular-services', [\App\Http\Controllers\Api\DashboardController::class, 'popularServices']);
+        Route::get('reports/revenue', [\App\Http\Controllers\Api\ReportController::class, 'revenue']);
+        Route::get('reports/transactions', [\App\Http\Controllers\Api\ReportController::class, 'transactions']);
+        Route::get('reports/therapist-performance', [\App\Http\Controllers\Api\ReportController::class, 'therapistPerformance']);
+        Route::get('reports/export/pdf/{segment}', [\App\Http\Controllers\Api\ReportController::class, 'exportPdf']);
+        Route::get('reports/export/excel/{segment}', [\App\Http\Controllers\Api\ReportController::class, 'exportExcel']);
+        Route::get('audit-logs', [\App\Http\Controllers\Api\AuditLogController::class, 'index']);
+        Route::get('audit-logs/{id}', [\App\Http\Controllers\Api\AuditLogController::class, 'show'])->whereNumber('id');
+        Route::get('settings', [\App\Http\Controllers\Api\SettingsController::class, 'index']);
+        Route::put('settings', [\App\Http\Controllers\Api\SettingsController::class, 'save']);
+        Route::get('therapists', [\App\Http\Controllers\Api\TherapistController::class, 'index']);
+        Route::post('therapists', [\App\Http\Controllers\Api\TherapistController::class, 'create']);
+        Route::get('therapists/{id}', [\App\Http\Controllers\Api\TherapistController::class, 'show'])->whereNumber('id');
+        Route::put('therapists/{id}', [\App\Http\Controllers\Api\TherapistController::class, 'update'])->whereNumber('id');
+        Route::delete('therapists/{id}', [\App\Http\Controllers\Api\TherapistController::class, 'delete'])->whereNumber('id');
+        Route::get('therapists/{id}/schedule', [\App\Http\Controllers\Api\TherapistController::class, 'schedule'])->whereNumber('id');
+        Route::get('therapist-schedules', [\App\Http\Controllers\Api\TherapistScheduleController::class, 'index']);
+        Route::post('therapist-schedules', [\App\Http\Controllers\Api\TherapistScheduleController::class, 'create']);
+        Route::put('therapist-schedules/{id}', [\App\Http\Controllers\Api\TherapistScheduleController::class, 'update'])->whereNumber('id');
+        Route::delete('therapist-schedules/{id}', [\App\Http\Controllers\Api\TherapistScheduleController::class, 'delete'])->whereNumber('id');
+        Route::get('therapist-leaves', [\App\Http\Controllers\Api\TherapistLeaveController::class, 'index']);
+        Route::post('therapist-leaves', [\App\Http\Controllers\Api\TherapistLeaveController::class, 'create']);
+        Route::put('therapist-leaves/{id}', [\App\Http\Controllers\Api\TherapistLeaveController::class, 'update'])->whereNumber('id');
+        Route::delete('therapist-leaves/{id}', [\App\Http\Controllers\Api\TherapistLeaveController::class, 'delete'])->whereNumber('id');
+        Route::get('rooms', [\App\Http\Controllers\Api\RoomController::class, 'index']);
+        Route::post('rooms', [\App\Http\Controllers\Api\RoomController::class, 'create']);
+        Route::get('rooms/{id}', [\App\Http\Controllers\Api\RoomController::class, 'show'])->whereNumber('id');
+        Route::put('rooms/{id}', [\App\Http\Controllers\Api\RoomController::class, 'update'])->whereNumber('id');
+        Route::delete('rooms/{id}', [\App\Http\Controllers\Api\RoomController::class, 'delete'])->whereNumber('id');
+        Route::get('categories', [\App\Http\Controllers\Api\CategoryController::class, 'index']);
+        Route::post('categories', [\App\Http\Controllers\Api\CategoryController::class, 'create']);
+        Route::get('categories/{id}', [\App\Http\Controllers\Api\CategoryController::class, 'show'])->whereNumber('id');
+        Route::put('categories/{id}', [\App\Http\Controllers\Api\CategoryController::class, 'update'])->whereNumber('id');
+        Route::delete('categories/{id}', [\App\Http\Controllers\Api\CategoryController::class, 'delete'])->whereNumber('id');
+        Route::get('services', [\App\Http\Controllers\Api\ServiceController::class, 'index']);
+        Route::post('services', [\App\Http\Controllers\Api\ServiceController::class, 'create']);
+        Route::get('services/{id}', [\App\Http\Controllers\Api\ServiceController::class, 'show'])->whereNumber('id');
+        Route::put('services/{id}', [\App\Http\Controllers\Api\ServiceController::class, 'update'])->whereNumber('id');
+        Route::delete('services/{id}', [\App\Http\Controllers\Api\ServiceController::class, 'delete'])->whereNumber('id');
+    });
+    Route::middleware('spa.role:owner,staff')->group(function () {
+        Route::get('customers', [\App\Http\Controllers\Api\CustomerController::class, 'index']);
+        Route::post('customers', [\App\Http\Controllers\Api\CustomerController::class, 'create']);
+        Route::get('customers/{id}', [\App\Http\Controllers\Api\CustomerController::class, 'show'])->whereNumber('id');
+        Route::put('customers/{id}', [\App\Http\Controllers\Api\CustomerController::class, 'update'])->whereNumber('id');
+        Route::delete('customers/{id}', [\App\Http\Controllers\Api\CustomerController::class, 'delete'])->whereNumber('id');
+        Route::get('customers/{id}/history', [\App\Http\Controllers\Api\CustomerController::class, 'history'])->whereNumber('id');
+        Route::get('bookings', [\App\Http\Controllers\Api\BookingController::class, 'index']);
+        Route::post('bookings', [\App\Http\Controllers\Api\BookingController::class, 'create']);
+        Route::put('bookings/{id}', [\App\Http\Controllers\Api\BookingController::class, 'update'])->whereNumber('id');
+        Route::delete('bookings/{id}', [\App\Http\Controllers\Api\BookingController::class, 'delete'])->whereNumber('id');
+        Route::post('bookings/{id}/checkin', [\App\Http\Controllers\Api\BookingController::class, 'checkIn'])->whereNumber('id');
+        Route::post('bookings/{id}/checkout', [\App\Http\Controllers\Api\BookingController::class, 'checkOut'])->whereNumber('id');
+        Route::put('bookings/{id}/status', [\App\Http\Controllers\Api\BookingController::class, 'updateStatus'])->whereNumber('id');
+        Route::get('transactions', [\App\Http\Controllers\Api\TransactionController::class, 'index']);
+        Route::get('transactions/{id}', [\App\Http\Controllers\Api\TransactionController::class, 'show'])->whereNumber('id');
+        Route::put('transactions/{id}', [\App\Http\Controllers\Api\TransactionController::class, 'update'])->whereNumber('id');
+        Route::delete('transactions/{id}', [\App\Http\Controllers\Api\TransactionController::class, 'delete'])->whereNumber('id');
+        Route::post('transactions/manual', [\App\Http\Controllers\Api\TransactionController::class, 'manualCreate']);
+        Route::post('transactions/from-booking', [\App\Http\Controllers\Api\TransactionController::class, 'create']);
+        Route::get('ratings', [\App\Http\Controllers\Api\RatingController::class, 'index']);
+        Route::get('ratings/{id}', [\App\Http\Controllers\Api\RatingController::class, 'show'])->whereNumber('id');
+        Route::post('ratings', [\App\Http\Controllers\Api\RatingController::class, 'create']);
+    });
+    Route::middleware('spa.role:therapist')->group(function () {
+        Route::get('therapist/my-schedule', [\App\Http\Controllers\Api\TherapistController::class, 'mySchedule']);
+        Route::get('therapist/my-bookings', [\App\Http\Controllers\Api\BookingController::class, 'myBookings']);
+        Route::get('therapist/my-ratings', [\App\Http\Controllers\Api\RatingController::class, 'myRatings']);
+        Route::get('therapist/my-performance', [\App\Http\Controllers\Api\TherapistController::class, 'myPerformance']);
+        Route::put('bookings/{id}/treatment-status', [\App\Http\Controllers\Api\BookingController::class, 'updateTreatmentStatus'])->whereNumber('id');
+    });
+    Route::middleware('spa.role:owner,staff,therapist')->group(function () {
+        Route::get('bookings/{id}', [\App\Http\Controllers\Api\BookingController::class, 'show'])->whereNumber('id');
+        Route::get('notifications', [\App\Http\Controllers\Api\NotificationController::class, 'index']);
+        Route::put('notifications/{id}/read', [\App\Http\Controllers\Api\NotificationController::class, 'markRead'])->whereNumber('id');
+        Route::put('notifications/read-all', [\App\Http\Controllers\Api\NotificationController::class, 'markAllRead']);
+        Route::get('notifications/unread-count', [\App\Http\Controllers\Api\NotificationController::class, 'unreadCount']);
+    });
+    Route::get('services/list', [\App\Http\Controllers\Api\ServiceController::class, 'list']);
+    Route::get('therapists/list', [\App\Http\Controllers\Api\TherapistController::class, 'list']);
+    Route::get('rooms/list', [\App\Http\Controllers\Api\RoomController::class, 'list']);
+});
+
+Route::view('/', 'spa');
+Route::get('/{path}', fn () => view('spa'))->where('path', '(?!api(?:/|$)).*');

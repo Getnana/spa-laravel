@@ -1,0 +1,4 @@
+/.env
+/vendor/
+/storage/app/exports/
+/storage/logs/*.log
